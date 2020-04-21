@@ -86,7 +86,7 @@ public class ModFolderObject : MonoBehaviour, IClearableForPool
 
         for(int i = 0; i < ModFolder.TextureFolders.Count; i++)
         {
-            FolderObject fo = folderObjectPool.Get<FolderObject>();//Instantiate(folderObjectPrefab, folderListParent);
+            FolderObject fo = folderObjectPool.Get<FolderObject>();
             fo.Name = ModFolder.TextureFolders[i].Name;
             fo.textureFolder = ModFolder.TextureFolders[i];
             fo.gameObject.SetActive(false);

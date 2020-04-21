@@ -32,6 +32,12 @@ public class BrowserManager : MonoBehaviour
         modification_time
     }
 
+    private enum NextDirection
+    {
+        up = -1,
+        down = 1
+    }
+
     #region unity properties
     [Header("Object pools")]
     [SerializeField]
@@ -104,6 +110,53 @@ public class BrowserManager : MonoBehaviour
         SetTextureTypeButtonColors();    
     }
 
+    private void Update()
+    {
+        if(folderSelection.Count == 1 && !Popup.Instance.gameObject.activeSelf)
+        {
+            NextDirection direction;
+
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                direction = NextDirection.up;
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                direction = NextDirection.down;
+            }
+            else
+            {
+                return;
+            }
+
+            //find sibling
+            if(TryFindNextFolder(folderSelection[0].transform.GetSiblingIndex(), out FolderObject next, direction))
+            {
+                ForceDeselect(folderSelection[0]);
+                AddFolderSelection(next);
+            }
+        }
+    }
+
+    private bool TryFindNextFolder(int index, out FolderObject folder, NextDirection direction)
+    {
+        int increment = (int)direction;
+        int last = folderList.childCount - 1;
+        folder = null;
+        while (!folder || !folder.gameObject.activeSelf)
+        {
+            index += increment;
+
+            if(index < 0 || index > last)
+            {
+                return false;
+            }
+
+            folder = folderList.GetChild(index).GetComponent<FolderObject>();
+        }
+        return true;
+    }
+
     private void OnEnable()
     {
         if(!Application.isPlaying)
@@ -136,7 +189,6 @@ public class BrowserManager : MonoBehaviour
 
         for (int i = 0; i < modFolderObjects.Count; i++)
         {
-            //Destroy(modFolderObjects[i].gameObject);
             modFolderObjects[i].ClearForPool();
             modFolderPool.Return(modFolderObjects[i]);
         }
